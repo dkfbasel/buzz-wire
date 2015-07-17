@@ -7,3 +7,7 @@
 # RUN ON RASPBERRY VIA SSH
 ssh pi@192.168.2.22
 ./pi-uninacht
+
+# PHYSICAL CONNECTIONS
+see pin assignment on http://pi.gadgetoid.com/pinout
+use the physical numbers (in black) to match gobot gpio pins
