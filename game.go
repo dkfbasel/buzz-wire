@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"sync"
 	"time"
 )
@@ -39,24 +40,26 @@ func init() {
 // handleButtonPress will be called on every button press
 // (i.e. start, stop, restart)
 func handleButtonPress(s interface{}) {
+	log.Println("button pressed")
 	state := readOutState()
 
 	// start or stop the game
 	if state == STOPPED {
-		startGame()
+		go startGame()
 	} else {
-		stopGame()
+		go stopGame()
 	}
 }
 
 // handleWireContact will be called whenever the user
 // touches the wire
 func handleWireContact(s interface{}) {
+	log.Println("wire touched")
 	state := readOutState()
 
 	// only do something if the time is running
 	if state == RUNNING {
-		increaseCounter()
+		go increaseCounter()
 	} else {
 		fmt.Println("the timer is currently not running")
 	}
@@ -65,11 +68,12 @@ func handleWireContact(s interface{}) {
 // handleGameFinished will be called whenever the user
 // is touching the finish platform
 func handleGameFinished(s interface{}) {
+	log.Println("game finished")
 	state := readOutState()
 
 	if state == RUNNING {
 		// game was finished before the timeout
-		finishGame(true)
+		go finishGame(true)
 	} else {
 		fmt.Println("the timer is currently not running")
 	}
@@ -96,6 +100,8 @@ func startGame() {
 	gameStart = currentTime
 	touchCounter = 0
 
+	// simulatedEvents <- "enableLed"
+
 	Mutex.Unlock()
 
 	// create a ticker-channel that can be
@@ -110,7 +116,7 @@ func startGame() {
 			case <-time.After(200 * time.Millisecond):
 				fmt.Println("TICK: ", time.Now().Sub(currentTime))
 			case <-tickerChannel:
-				break
+				return
 			}
 		}
 	}()
@@ -120,7 +126,7 @@ func startGame() {
 	case <-time.After(timeout):
 		fmt.Println("The game timed out")
 		// game was not finished before the timeout
-		finishGame(false)
+		go finishGame(false)
 
 		// stop the clock ticker
 		close(tickerChannel)
@@ -136,17 +142,6 @@ func startGame() {
 
 }
 
-func flushTimeoutChannel() {
-	for {
-		select {
-		case <-cancelTimeout:
-			fmt.Println("flushing out cancel event")
-		default:
-			return
-		}
-	}
-}
-
 // stopGame will stop/abort the current round
 func stopGame() {
 	Mutex.Lock()
@@ -158,8 +153,14 @@ func stopGame() {
 		return
 	}
 
+	// simulatedEvents <- "disableLed"
+
 	// cancel the timeout from already running game
-	cancelTimeout <- true
+	// note: this will not block if channel cannot receive
+	select {
+	case cancelTimeout <- true:
+	default:
+	}
 
 	// set the game state to stopped
 	gameState = STOPPED
@@ -167,10 +168,11 @@ func stopGame() {
 
 func increaseCounter() {
 	Mutex.Lock()
-	defer Mutex.Unlock()
 
 	// increase the count of contacts
 	touchCounter += 1
+
+	Mutex.Unlock()
 }
 
 func finishGame(beforeTimeout bool) {
@@ -193,6 +195,8 @@ func finishGame(beforeTimeout bool) {
 		fmt.Println("Game was already stopped")
 		return
 	}
+
+	// simulatedEvents <- "disableLed"
 
 	// set the game state to stopped
 	gameState = STOPPED
