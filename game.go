@@ -124,38 +124,32 @@ func startGame() {
 	// create a separate go-routine for our ticker
 	go func(startTime time.Time, done <-chan struct{}) {
 		fmt.Println("game started")
-	game:
 		for {
 			select {
 			// create a ticker to check the time in regular timespans
 			case <-time.After(200 * time.Millisecond):
 				timeElapsed := time.Now().Sub(startTime)
-				fmt.Println("TICK: ", timeElapsed.Seconds())
+				fmt.Print("\rTICK: ", timeElapsed.Seconds())
 
 				if timeElapsed >= timeout {
-					fmt.Println("Game timed out")
 					finishChannel <- TIMEOUT
 				}
 
 			case <-done:
-				break game
+				return
 			}
 		}
 
-		fmt.Println("finished the start routine")
 	}(startTime, done)
 
 	// increase the touch counter on every touch
 	go func(startTime time.Time, counter int, done chan struct{}) {
-	game:
 		for {
 			select {
 			case <-contactChannel:
-				fmt.Println("contact registered")
 				counter += 1
 
 			case reason := <-finishChannel:
-				fmt.Println("finish event registered")
 				timeElapsed := time.Now().Sub(startTime)
 
 				// set the state of the game to stopped
@@ -165,14 +159,12 @@ func startGame() {
 				fmt.Printf(resultLog, reason, timeElapsed.Seconds(), counter)
 
 				close(done)
-				break game
+				return
 
 			case <-done:
-				break game
+				return
 			}
 		}
-
-		fmt.Println("finished the game..")
 
 	}(startTime, touchCounter, done)
 
