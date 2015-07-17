@@ -40,10 +40,10 @@ func main() {
 		// user made contact with wire
 		gobot.On(contact.Event("push"), handleWireContact)
 
-		gobot.Every(1*time.Second, func() {
-			fmt.Println("BUTTON IS ACTIVE:", button.Active)
-			led.Toggle()
-		})
+		// gobot.Every(1*time.Second, func() {
+		// 	fmt.Println("BUTTON IS ACTIVE:", button.Active)
+		// 	led.Toggle()
+		// })
 
 		go func() {
 
@@ -74,16 +74,16 @@ func main() {
 
 	}
 
-	// robot := gobot.NewRobot("buzzwire",
-	// 	[]gobot.Connection{},
-	// 	[]gobot.Device{},
-	// 	work)
-
-	// define a base robot
 	robot := gobot.NewRobot("buzzwire",
-		[]gobot.Connection{raspberry},
-		[]gobot.Device{button, contact, led},
+		[]gobot.Connection{},
+		[]gobot.Device{},
 		work)
+
+	// // define a base robot
+	// robot := gobot.NewRobot("buzzwire",
+	// 	[]gobot.Connection{raspberry},
+	// 	[]gobot.Device{button, contact, led},
+	// 	work)
 
 	// add the robot to the fleet
 	gbot.AddRobot(robot)

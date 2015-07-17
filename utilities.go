@@ -7,6 +7,15 @@ import (
 	"strings"
 )
 
+// define the string we use to log our results
+var resultLog string = `
+RESULTS:
+---------
+Stop Reason: %v
+Duration:    %v
+Contacts:    %v
+`
+
 // parseMessages will parse the command line and send
 // the input to a channel
 func parseCommandLine(messages chan<- string, done chan<- bool) {
@@ -34,6 +43,7 @@ func parseCommandLine(messages chan<- string, done chan<- bool) {
 	}
 }
 
+// drawInterface will draw a nice textural gui for our game
 func drawInterface(buttonState bool, timeElapsed string) {
 
 	buttonText := " "
@@ -56,9 +66,26 @@ func drawInterface(buttonState bool, timeElapsed string) {
 
 }
 
+// padLeft will pad the given string with the given character until
+// the overal given length is reached
 func padLeft(s string, padStr string, overallLen int) string {
 	var padCountInt int
 	padCountInt = 1 + ((overallLen - len(padStr)) / len(padStr))
 	var retStr = strings.Repeat(padStr, padCountInt) + s
 	return retStr[(len(retStr) - overallLen):]
+}
+
+// getState will get the game state safe for concurrency
+func getState() State {
+	Mutex.Lock()
+	state := gameState
+	Mutex.Unlock()
+	return state
+}
+
+// setState will set the game state safe for concurrency
+func setState(state State) {
+	Mutex.Lock()
+	gameState = state
+	Mutex.Unlock()
 }
