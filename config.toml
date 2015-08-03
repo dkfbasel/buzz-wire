@@ -1,0 +1,10 @@
+# CONFIGURATION OPTIONS FOR THE UNINACHT BUZZ-WIRE GAME
+
+# mode that the game is run in (debug/release)
+mode = "debug"
+
+# timespan before the game times out
+timeout = "10s"
+
+# debouncing of the wire contact
+debounceContact = "300ms"
