@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -114,6 +115,9 @@ func handleFinishContact(s interface{}) {
 // startGame will start a new round
 func startGame(gender Gender) {
 
+	// signal the webserver that we are about to start the game
+	signalChannel <- "game::start::" + string(gender)
+
 	// initialize the start time and touch counter
 	startTime := time.Now()
 	touchCounter := 0
@@ -168,6 +172,9 @@ func startGame(gender Gender) {
 				fmt.Println("register contact")
 				counter += 1
 
+				// signal the webserver that the wire was touched
+				signalChannel <- "game::contact::" + strconv.Itoa(counter)
+
 				// sound the buzzer
 				select {
 				case GameEvents <- "soundBuzzer":
@@ -175,7 +182,11 @@ func startGame(gender Gender) {
 				}
 
 			case reason := <-finishChannel:
+
 				timeElapsed := time.Now().Sub(startTime)
+
+				// signal the webserver that the game was finished
+				signalChannel <- "game::finished::" + strconv.FormatFloat(timeElapsed.Seconds(), 'f', 3, 64)
 
 				// set the state of the game to stopped
 				setState(IS_STOPPED)

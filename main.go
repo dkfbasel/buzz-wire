@@ -68,7 +68,7 @@ func main() {
 
 		// user is starting the game (must touch the starting area)
 		// TODO: add handler for starting event
-		// gobot.On(contactStart.Event("push"), handleFinishContact)
+		// gobot.On(contactStart.Event("push"), handleStartContact)
 
 		// user finished the game (touched finish area)
 		gobot.On(contactFinish.Event("push"), handleFinishContact)
@@ -139,7 +139,10 @@ func main() {
 	// add the robot to the fleet
 	gbot.AddRobot(robot)
 
-	// start the robot
+	// start the webserver in a separate go routine
+	go startServer("localhost:8484")
+
+	// start the robot (blocking)
 	gbot.Start()
 }
 
@@ -172,6 +175,9 @@ func initConfiguration() {
 	// note: the contactChannel is debounced to handle continuous triggering of the contact
 	contactChannel = make(chan bool)
 	contactChannelDebounced = debounceContactChannel(DebounceContact, contactChannel)
+
+	// we also need a signal channel to communicate events to the webserver
+	signalChannel = make(chan string)
 
 	// handle finish events
 	finishChannel = make(chan StopReason)
