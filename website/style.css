@@ -1,0 +1,67 @@
+body {
+  background-color: #efefef;
+  font-family: "Open Sans", "Source Sans Pro", "Helvetica Neue", "Helvetica";
+  font-weight: 300; }
+
+#container {
+  width: 800px;
+  margin: 40px auto;
+  padding: 40px;
+  background-color: #fff;
+  border-radius: 1px;
+  box-shadow: 2px 2px 4px #838383; }
+
+.buttons {
+  display: block;
+  margin-bottom: 40px; }
+
+.button {
+  box-sizing: border-box;
+  text-align: center;
+  border: 1px solid #b6b6b6;
+  display: inline-block;
+  padding: 20px 40px;
+  margin-right: 16px;
+  cursor: pointer; }
+
+#buttonMan {
+  background-color: #1aaf4d;
+  color: #fff;
+  box-shadow: 4px 4px 0px 0px rgba(19, 84, 11, 0.56); }
+
+#buttonWoman {
+  background-color: #c82c11;
+  color: #fff;
+  box-shadow: 4px 4px 0px 0px rgba(84, 11, 11, 0.56); }
+
+.elements div {
+  float: left;
+  width: 180px;
+  margin-right: 10px; }
+
+.elements {
+  margin-bottom: 20px; }
+  .elements::after {
+    clear: both;
+    content: "";
+    display: table; }
+
+.title {
+  text-transform: uppercase;
+  padding-top: 6px; }
+
+.counter {
+  padding-top: 12px;
+  font-size: 40px;
+  font-family: consolas; }
+
+#console {
+  clear: both;
+  background: #efefef;
+  font-family: consolas;
+  font-size: 12px;
+  margin-top: 20px;
+  min-height: 60px;
+  padding: 20px; }
+
+/*# sourceMappingURL=style.css.map */

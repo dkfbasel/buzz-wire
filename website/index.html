@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>WebSocket</title>
+
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+	<div id="container">
+
+		<!-- show start/stop button -->
+		<div class="buttons">
+			<div id="buttonMan" class="button">Mann</div>
+			<div id="buttonWoman" class="button">Frau</div>
+		</div>
+
+		<div class="elements">
+
+			<!-- was the start of the wire touched -->
+			<div>
+				<div class="title">Start</div>
+				<div class="counter" id="contact-start">--</div>
+			</div>
+
+			<!-- how many times was the wire touched -->
+			<div>
+				<div class="title">Berührungen</div>
+				<div class="counter" id="contact-wire">0</div>
+			</div>
+
+			<!-- how much time elapsed since the start -->
+			<div>
+				<div class="title">Zeit</div>
+				<div class="counter" id="time">00:00</div>
+			</div>
+
+			<!-- was the end of the wire touched -->
+			<div>
+				<div class="title">Finish</div>
+				<div class="counter" id="contact-end">--</div>
+			</div>
+
+		</div>
+
+		<!-- log all events from websocket -->
+		<pre id="console"></pre>
+
+	</div>
+
+
+
+	<script type="text/javascript" src="websocket.min.js"></script>
+	<script type="text/javascript" src="lodash.min.js"></script>
+
+	<script>
+
+		// create a reconnecting websocket
+		var loc = window.location;
+		var uri = 'ws:';
+
+		uri += '//' + loc.host;
+		uri += loc.pathname + 'ws';
+
+		// open an auto-reconnecting websocket
+		var ws = new ReconnectingWebSocket(uri);
+		ws.debug = false;
+
+		ws.onopen = function() {
+			console.log('Connected to the game engine')
+		}
+
+		// get our element for manipulation
+		var out = document.getElementById('console');
+		var buttonMan = document.getElementById('buttonMan');
+		var buttonWoman = document.getElementById('buttonWoman');
+
+		var start = document.getElementById('contact-start');
+		var finish = document.getElementById('contact-finish');
+		var contacts = document.getElementById('contact-wire');
+
+		var time = document.getElementById('time');
+
+		ws.onmessage = function(event) {
+			// get the message of the event
+			message = event.data;
+
+			// split the message into separate tokens
+			tokens = message.split("::");
+
+			// preserve the message in our console
+			out.innerHTML += message + '\n';
+
+			switch (tokens[1]) {
+				case "start":
+					start.innerHTML = tokens[2];
+					break;
+
+				case "contact":
+					contacts.innerHTML = tokens[2];
+					break;
+
+				case "finished":
+					time.innerHTML = tokens[2];
+					break;
+			}
+		}
+
+		ws.onclose = function() {
+			console.log('Closed connection to the game engine');
+		}
+
+	</script>
+</body>
+</html>
