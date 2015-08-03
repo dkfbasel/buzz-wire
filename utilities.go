@@ -5,15 +5,85 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 )
+
+// getState will get the game state safe for concurrency
+func getState() State {
+	Mutex.Lock()
+	state := GameState
+	Mutex.Unlock()
+	return state
+}
+
+// setState will set the game state safe for concurrency
+func setState(state State) {
+	Mutex.Lock()
+	GameState = state
+	Mutex.Unlock()
+}
+
+// debounceContactChannel will put of responding to a given channel for the specified interval
+// i.e. to debounce user contact with the wire
+func debounceContactChannel(interval time.Duration, output chan bool) chan bool {
+
+	// initialize the channel to receive input on
+	input := make(chan bool)
+
+	go func() {
+		var buffer bool
+		var ok bool
+
+		// we wait until our input gets called at least once or the input channel is closed
+		buffer, ok = <-input
+		if !ok {
+			return
+		}
+
+		// we pass the value from the initial call to our output channel
+		output <- buffer
+
+		// we initialize a wait function
+		for {
+			select {
+			// we wait for a signal or closing of the input channel
+			case buffer, ok = <-input:
+				fmt.Println("debounced ..")
+
+				// exit if the input channel was closed
+				if !ok {
+					return
+				}
+
+			// wait for the given time interval
+			case <-time.After(interval):
+				// send the data once to the output channel and start waiting again
+				output <- <-input
+			}
+		}
+	}()
+
+	return input
+}
+
+// --- TESTING UTILITIES ---
 
 // define the string we use to log our results
 var resultLog string = `
 RESULTS:
 ---------
+Gender:      %v
 Stop Reason: %v
 Duration:    %v
 Contacts:    %v
+`
+
+var commandsInfo string = `
+COMMANDS:
+---------
+button:  User pressed button
+contact: User made contact to wire
+finish:  User finished the game
 `
 
 // parseMessages will parse the command line and send
@@ -39,6 +109,11 @@ func parseCommandLine(messages chan<- string, done chan<- bool) {
 			fmt.Print("\033[H\033[2J")
 			continue
 		}
+
+		if message == "c" {
+			message = "contact"
+		}
+
 		messages <- message
 	}
 }
@@ -73,19 +148,4 @@ func padLeft(s string, padStr string, overallLen int) string {
 	padCountInt = 1 + ((overallLen - len(padStr)) / len(padStr))
 	var retStr = strings.Repeat(padStr, padCountInt) + s
 	return retStr[(len(retStr) - overallLen):]
-}
-
-// getState will get the game state safe for concurrency
-func getState() State {
-	Mutex.Lock()
-	state := gameState
-	Mutex.Unlock()
-	return state
-}
-
-// setState will set the game state safe for concurrency
-func setState(state State) {
-	Mutex.Lock()
-	gameState = state
-	Mutex.Unlock()
 }
