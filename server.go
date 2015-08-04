@@ -1,10 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"github.com/skratchdot/open-golang/open"
 	"golang.org/x/net/websocket"
 )
 
@@ -29,6 +32,9 @@ func startServer(address string) {
 	// handle websocket connections
 	server.WebSocket("/ws", handleSocketConnection)
 
+	// open the page in the default browser
+	go openInDefaultBrowser(address)
+
 	// run the server (blocking)
 	server.Run(address)
 }
@@ -52,4 +58,14 @@ func handleSocketConnection(c *echo.Context) error {
 
 	}
 
+}
+
+// openInDefaultBrowser will open the given address in the users default browser
+// (after a short timeout)
+func openInDefaultBrowser(address string) {
+	<-time.After(100 * time.Millisecond)
+	err := open.Start("http://" + address + "/")
+	if err != nil {
+		fmt.Println("Bitte öffnen Sie Ihren Browser auf der Adresse", address)
+	}
 }
