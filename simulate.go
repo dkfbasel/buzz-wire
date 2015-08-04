@@ -21,7 +21,7 @@ func simulate(eventChannel chan<- string) {
 	for {
 		select {
 		case message := <-messageChan:
-			if message == "button" || message == "contact" || message == "finish" || message == "off" {
+			if message == "button" || message == "contact" || message == "finish" || message == "off" || message == "start" {
 				eventChannel <- message
 			}
 
