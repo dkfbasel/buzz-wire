@@ -49,8 +49,7 @@
 
 	</div>
 
-
-
+	<!-- use special reconnectingWebsockets and lodash -->
 	<script type="text/javascript" src="websocket.min.js"></script>
 	<script type="text/javascript" src="lodash.min.js"></script>
 
@@ -77,10 +76,21 @@
 		var buttonWoman = document.getElementById('buttonWoman');
 
 		var start = document.getElementById('contact-start');
-		var finish = document.getElementById('contact-finish');
+		var finish = document.getElementById('contact-end');
 		var contacts = document.getElementById('contact-wire');
 
 		var time = document.getElementById('time');
+
+		// define some variables to have a ticking timer
+		var startTime;
+		var timerReference;
+
+		var showTimer = function() {
+			var currentTime = new Date().getTime();
+			var durationInMillisecs = currentTime - startTime;
+
+			time.innerHTML = (durationInMillisecs / 1000).toFixed(1);
+		}
 
 		ws.onmessage = function(event) {
 			// get the message of the event
@@ -94,15 +104,45 @@
 
 			switch (tokens[1]) {
 				case "start":
+
+					// indicate the button pressed
 					start.innerHTML = tokens[2];
+					if (tokens[2] == "female") {
+						buttonWoman.className = "button glowing";
+					} else {
+						buttonMan.className = "button glowing";
+					}
+
+					// reset the timer and finish text
+					contacts.innerHTML = "0";
+					time.innerHTML = "00:00";
+					finish.innerHTML = "--";
+
+					// start a ticking clock
+					startTime = new Date().getTime();
+					window.clearInterval(timerReference);
+					timerReference = window.setInterval(showTimer, 10);
 					break;
 
 				case "contact":
+					// show the number of contacts with the wire
 					contacts.innerHTML = tokens[2];
 					break;
 
 				case "finished":
-					time.innerHTML = tokens[2];
+					// clear the ticking clock
+					window.clearInterval(timerReference);
+
+					// clear the button indicators
+					buttonWoman.className = "button";
+					buttonMan.className = "button";
+
+					// clear the start info
+					start.innerHTML = "--";
+
+					// show the finish info (including time, contacts, ..)
+					finish.innerHTML = tokens[2];
+					time.innerHTML = tokens[3];
 					break;
 			}
 		}

@@ -28,11 +28,17 @@ body {
   background-color: #1aaf4d;
   color: #fff;
   box-shadow: 4px 4px 0px 0px rgba(19, 84, 11, 0.56); }
+  #buttonMan.glowing {
+    background-color: #4be47f;
+    box-shadow: inset 0 0 2px rgba(24, 115, 12, 0.65); }
 
 #buttonWoman {
   background-color: #c82c11;
   color: #fff;
   box-shadow: 4px 4px 0px 0px rgba(84, 11, 11, 0.56); }
+  #buttonWoman.glowing {
+    background-color: #f0674f;
+    box-shadow: inset 0 0 2px rgba(184, 37, 17, 0.76); }
 
 .elements div {
   float: left;
