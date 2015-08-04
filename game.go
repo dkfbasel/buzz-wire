@@ -36,6 +36,7 @@ var Timeout time.Duration
 // define some communication channels
 var contactChannel chan bool          // a channel to register all contacts with the wire
 var contactChannelDebounced chan bool // a debouncer for our contact channel
+var startChannel chan bool            // a channel to register touching the start area
 var finishChannel chan StopReason     // a channel to register finish events (from user or timeout)
 
 var DebounceContact time.Duration // how long should the contact channel be debounced
@@ -70,7 +71,11 @@ func handleButtonPress(gender Gender) {
 // handleStartContact will make sure, that the users is starting from the
 // beginning of the wire
 func handleStartContact(s interface{}) {
-	// TODO: make sure the user starts from the start area
+	// send a signal down the start channel
+	select {
+	case startChannel <- true:
+	default:
+	}
 }
 
 // handleWireContact will be called whenever the user
@@ -166,11 +171,27 @@ func startGame(gender Gender) {
 
 	// increase the touch counter on every touch
 	go func(startTime time.Time, counter int, gender Gender, done chan struct{}) {
+
+		// check if the user touched the start of the wire
+		var startTouched bool
+
 		for {
 			select {
+			case <-startChannel:
+				fmt.Println("start region touched")
+				startTouched = true
+
 			case <-contactChannel:
 				fmt.Println("register contact")
-				counter += 1
+
+				// check if the start region has been touched before
+				if startTouched == false {
+					fmt.Println("BEEP: start region not touched yet")
+					break
+				}
+
+				// increase the touch counter
+				counter++
 
 				// signal the webserver that the wire was touched
 				signalChannel <- "game::contact::" + strconv.Itoa(counter)
@@ -186,7 +207,7 @@ func startGame(gender Gender) {
 				timeElapsed := time.Now().Sub(startTime)
 
 				// signal the webserver that the game was finished
-				signalChannel <- "game::finished::" + strconv.FormatFloat(timeElapsed.Seconds(), 'f', 3, 64)
+				signalChannel <- "game::finished::" + string(reason) + "::" + strconv.FormatFloat(timeElapsed.Seconds(), 'f', 3, 64)
 
 				// set the state of the game to stopped
 				setState(IS_STOPPED)
