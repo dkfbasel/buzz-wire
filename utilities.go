@@ -10,9 +10,9 @@ import (
 
 // getState will get the game state safe for concurrency
 func getState() State {
-	Mutex.Lock()
+	Mutex.RLock()
 	state := GameState
-	Mutex.Unlock()
+	Mutex.RUnlock()
 	return state
 }
 

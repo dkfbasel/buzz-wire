@@ -41,7 +41,7 @@ var finishChannel chan StopReason     // a channel to register finish events (fr
 var DebounceContact time.Duration // how long should the contact channel be debounced
 
 // lock concurrent access to the shared variables
-var Mutex *sync.Mutex
+var Mutex *sync.RWMutex
 
 // --- EVENT HANDLERS FOR USER INTERACTION ---
 
