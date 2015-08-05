@@ -121,7 +121,7 @@ func handleFinishContact(s interface{}) {
 func startGame(gender Gender) {
 
 	// signal the webserver that we are about to start the game
-	signalChannel <- "game::start::" + string(gender)
+	signal("game::start::" + string(gender))
 	fmt.Println("game almost started")
 
 	// initialize the start time and touch counter

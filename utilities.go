@@ -23,6 +23,13 @@ func setState(state State) {
 	Mutex.Unlock()
 }
 
+// signal will send an asynchronous signal on the signal channel
+func signal(message string) {
+	go func() {
+		signalChannel <- message
+	}()
+}
+
 // debounceContactChannel will put of responding to a given channel for the specified interval
 // i.e. to debounce user contact with the wire
 func debounceContactChannel(interval time.Duration, output chan bool) chan bool {
@@ -69,7 +76,7 @@ func debounceContactChannel(interval time.Duration, output chan bool) chan bool 
 // --- TESTING UTILITIES ---
 
 // define the string we use to log our results
-var resultLog string = `
+var resultLog = `
 RESULTS:
 ---------
 Gender:      %v
@@ -78,7 +85,7 @@ Duration:    %v
 Contacts:    %v
 `
 
-var commandsInfo string = `
+var commandsInfo = `
 COMMANDS:
 ---------
 button:  User pressed button

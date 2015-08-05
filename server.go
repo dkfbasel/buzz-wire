@@ -51,13 +51,14 @@ func handleSocketConnection(c *echo.Context) error {
 	// upgrade the connection to a socket
 	ws := c.Socket()
 
-	for {
-		// send signals to client if something is put on the signalChannel
-		// note: signalChannel will block until next receive
-		signal := <-signalChannel
-		fmt.Println("SIGNAL:", signal)
+	// send signals to client if something is put on the signalChannel
+	// note: signalChannel will block until next receive
+	for signal := range signalChannel {
 		websocket.Message.Send(ws, signal)
+		fmt.Println("SIGNAL:", signal)
 	}
+
+	return nil
 
 }
 

@@ -39,7 +39,7 @@ func initConfiguration() {
 	contactChannelDebounced = debounceContactChannel(DebounceContact, contactChannel)
 
 	// we need a signal channel to communicate events to the webserver
-	signalChannel = make(chan string)
+	signalChannel = make(chan string, 100)
 
 	// handle start events
 	startChannel = make(chan bool)
