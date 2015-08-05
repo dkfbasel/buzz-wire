@@ -52,10 +52,11 @@ func handleSocketConnection(c *echo.Context) error {
 	ws := c.Socket()
 
 	for {
-		// send signals if something is put on the signalChannel
+		// send signals to client if something is put on the signalChannel
+		// note: signalChannel will block until next receive
 		signal := <-signalChannel
+		fmt.Println("SIGNAL:", signal)
 		websocket.Message.Send(ws, signal)
-
 	}
 
 }

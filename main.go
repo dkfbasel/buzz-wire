@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/hybridgroup/gobot"
@@ -122,6 +123,8 @@ func main() {
 	// switch cases depending on the mode
 	if Mode == MODE_DEBUG {
 		// debug mode is run on the mac without physical connections
+		fmt.Println("RUNNING IN DEBUG-MODE")
+
 		robot = gobot.NewRobot("buzzwire",
 			[]gobot.Connection{},
 			[]gobot.Device{},
