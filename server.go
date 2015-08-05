@@ -33,7 +33,7 @@ func startServer(address string) {
 	server.WebSocket("/ws", handleSocketConnection)
 
 	// open the page in the default browser
-	go openInDefaultBrowser(address)
+	// go openInDefaultBrowser(address)
 
 	// run the server (blocking)
 	server.Run(address)
