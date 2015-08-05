@@ -19,7 +19,7 @@ type StopReason string
 
 const FINISHED StopReason = "user finished the game"
 const TIMEOUT StopReason = "game timed out"
-const STOPPED StopReason = "user stoped the game"
+const STOPPED StopReason = "user stopped the game"
 
 // define the genders available in our application
 type Gender string
