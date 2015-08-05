@@ -30,7 +30,7 @@ func main() {
 
 	// start/stop button for a woman
 	buttonWoman := gpio.NewButtonDriver(raspberry, "buttonWoman", "11")
-	ledWoman := gpio.NewLedDriver(raspberry, "ledWoman", "25") // or 12
+	ledWoman := gpio.NewLedDriver(raspberry, "ledWoman", "12")
 
 	// start/stop buttom for a man
 	// buttonMan := gpio.NewButtonDriver(raspberry, "buttonMan", "32")
@@ -38,7 +38,7 @@ func main() {
 
 	// contact with the wire (start- and finish-area)
 	// contactStart := gpio.NewButtonDriver(raspberry, "contactStart", "33")
-	contactFinish := gpio.NewButtonDriver(raspberry, "contactFinish", "35")
+	contactFinish := gpio.NewButtonDriver(raspberry, "contactFinish", "36")
 
 	// user made contact with the wire (use buzzer to indicate audible)
 	contactWire := gpio.NewButtonDriver(raspberry, "contactWire", "15")
