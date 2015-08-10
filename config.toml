@@ -4,7 +4,7 @@
 mode = "debug"
 
 # timespan before the game times out
-timeout = "10s"
+timeout = "20s"
 
 # debouncing of the wire contact
 debounceContact = "300ms"
