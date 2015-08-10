@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"time"
 )
 
 // simulate can be used to simulate raspberry pi events
@@ -29,9 +28,6 @@ func simulate(eventChannel chan<- string) {
 			fmt.Println("shutting down")
 			os.Exit(0)
 
-		case <-time.After(30 * time.Second):
-			fmt.Println("simulation time has expired, we are shutting down ..")
-			os.Exit(0)
 		}
 	}
 
