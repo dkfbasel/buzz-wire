@@ -17,9 +17,9 @@ const IS_STOPPED State = "stopped"
 // define our stop reasons
 type StopReason string
 
-const FINISHED StopReason = "user finished the game"
-const TIMEOUT StopReason = "game timed out"
-const STOPPED StopReason = "user stopped the game"
+const FINISHED StopReason = "finished"
+const TIMEOUT StopReason = "timeout"
+const STOPPED StopReason = "stopped"
 
 // define the genders available in our application
 type Gender string
@@ -185,10 +185,11 @@ func startGame(gender Gender) {
 			case <-contactChannel:
 				fmt.Println("register contact")
 
+				// TODO: enable checking for start contact
 				// check if the start region has been touched before
 				if startTouched == false {
-					fmt.Println("BEEP: start region not touched yet")
-					break
+					// fmt.Println("BEEP: start region not touched yet")
+					// break
 				}
 
 				// increase the touch counter
