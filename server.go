@@ -23,8 +23,11 @@ func startServer(address string) {
 
 	// server static files
 	server.Index("website/index.html")
-	server.ServeFile("/websocket.min.js", "website/websocket.min.js")
-	server.ServeFile("/lodash.min.js", "website/lodash.min.js")
+
+	server.ServeFile("/velocity.min.js", "website/velocity.min.js")
+	server.ServeFile("/animations.js", "website/animations.js")
+	server.ServeFile("/application.js", "website/application.js")
+
 	server.ServeFile("/style.css", "website/style.css")
 	server.ServeFile("/style.css.map", "website/style.css.map")
 	server.ServeFile("/style.scss", "website/style.scss")
