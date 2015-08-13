@@ -1,5 +1,28 @@
 /* globals Velocity, console */
 
+// --- INITIALIZE ELEMENTS ---
+
+var main = {
+	elements: {
+		canvas: document.getElementById('canvas'),
+		counter: document.getElementById('counter'),
+		disconnect: document.getElementById('disconnect')
+	},
+	showCanvas: null,
+	showCounter: null,
+	showDisconnect: null
+};
+
+var counter = {
+	elements: {
+		number1: document.getElementById('counter-number-1'),
+		number2: document.getElementById('counter-number-2'),
+		number3: document.getElementById('counter-number-3')
+	},
+	start: null,
+	hide: null
+};
+
 var ambulance = {
 	elements: {
 		group: document.getElementById('ambulance'),
@@ -8,7 +31,7 @@ var ambulance = {
 		driving: document.getElementById('car-driving-animation'),
 		siren: document.getElementById('siren'),
 
-		carBackground: document.getElementById('background'),
+		carBackground: document.getElementById('car-background'),
 		carBandHorizontal: document.getElementById('band-horizontal'),
 		carBandVertical: document.getElementById('band-vertical'),
 		carBandVerticalPart: document.getElementById('band-vertical-part'),
@@ -26,6 +49,10 @@ var ambulance = {
 		wheelBackRim: document.getElementById('wheel-back-rim'),
 		wheelBackRimHighlight: document.getElementById('wheel-back-rim-highlight'),
 
+		driver: document.getElementById('driver'),
+		driverMan: document.getElementById('man'),
+		driverWoman: document.getElementById('woman')
+
 	},
 	start: null,
 	bump: null,
@@ -36,7 +63,8 @@ var ambulance = {
 
 var hospital = {
 	elements: {
-		group: document.getElementById('hospital')
+		group: document.getElementById('hospital'),
+		door: document.getElementById('door')
 	}
 };
 
@@ -52,25 +80,98 @@ var hud = {
 	hide: null
 };
 
+// --- INITIALIZE THE START POSITION OF OUR CANVAS
+
 // set transform origin on wheels to allow for rotation
-ambulance.elements.wheelFront.style.transformOrigin = '36px 35px';
-ambulance.elements.wheelBack.style.transformOrigin = '36px 35px';
+Velocity.hook(
+	[ambulance.elements.wheelBack, ambulance.elements.wheelFront],
+	'transformOrigin', '36px 35px');
 
 // transform origin of rotated sign elements
-ambulance.elements.carSignRotateLeft.style.transformOrigin = "50% 50%";
-ambulance.elements.carSignRotateRight.style.transformOrigin = "50% 50%";
+Velocity.hook(
+	[ambulance.elements.carSignRotateLeft, ambulance.elements.carSignRotateRight],
+	'transformOrigin', '37px 37px'
+);
+
 Velocity.hook(ambulance.elements.carSignRotateLeft, 'rotateZ', '-60deg');
 Velocity.hook(ambulance.elements.carSignRotateRight, 'rotateZ', '60deg');
 
 
 // transform car origin for rotation
-ambulance.elements.car.style.transformOrigin = '50% 100%';
+Velocity.hook(ambulance.elements.car, 'transformOrigin', '195px 260px');
 
-// transform origin of hospital for scaling
-hospital.elements.group.style.transformOrigin = '100% 100%';
-hospital.elements.group.style.transform = 'scale(0.5)';
-hospital.elements.group.style.visibility = 'visible';
 
+// --- MAIN ELEMENTS ---
+
+// show disconnected message
+main.showDisconnect = function() {
+	main.elements.disconnect.style.opacity = '1';
+	main.elements.counter.style.opacity = '0';
+	main.elements.canvas.style.opacity = '0';
+};
+
+// show disconnected message
+main.showCounter = function() {
+	main.elements.disconnect.style.opacity = '0';
+	main.elements.counter.style.opacity = '1';
+	main.elements.canvas.style.opacity = '0';
+
+	// set the opacity on our numbers
+	counter.elements.number3.style.opacity = '1';
+	counter.elements.number2.style.opacity = '0';
+	counter.elements.number1.style.opacity = '0';
+};
+
+main.showCanvas = function() {
+	main.elements.disconnect.style.opacity = '0';
+	main.elements.counter.style.opacity = '0';
+	main.elements.canvas.style.opacity = '1';
+};
+
+// --- COUNTER ---
+
+// start the counter
+counter.start = function(callback) {
+
+	// hide the main canvas
+	main.elements.disconnect.style.opacity = '0';
+	main.elements.counter.style.opacity = '1';
+	main.elements.canvas.style.opacity = '0';
+
+	// set the opacity on our numbers
+	counter.elements.number3.style.opacity = '1';
+	counter.elements.number2.style.opacity = '0';
+	counter.elements.number1.style.opacity = '0';
+
+	window.setTimeout(function() {
+		counter.elements.number3.style.opacity = '0';
+		counter.elements.number2.style.opacity = '1';
+		counter.elements.number1.style.opacity = '0';
+
+		window.setTimeout(function() {
+			counter.elements.number3.style.opacity = '0';
+			counter.elements.number2.style.opacity = '0';
+			counter.elements.number1.style.opacity = '1';
+
+			window.setTimeout(function() {
+
+				main.elements.counter.style.opacity = '0';
+				main.elements.canvas.style.opacity = '1';
+
+				if (callback) {
+					callback();
+				}
+			}, 1000);
+
+		}, 1000);
+
+	}, 1000);
+
+};
+
+// --- AMBULANCE ---
+
+// make the wheels rotating
 var rotateWheel = function(element, startValue) {
 	Velocity(element, {
 		rotateZ: [720 + startValue, startValue]
@@ -84,8 +185,65 @@ var rotateWheel = function(element, startValue) {
 	});
 };
 
+
 // start the ambulance
-ambulance.start = function() {
+ambulance.start = function(gender) {
+
+	main.elements.disconnect.style.opacity = '0';
+	main.elements.counter.style.opacity = '0';
+	main.elements.canvas.style.opacity = '1';
+
+	// set woman and man driver to hidden
+	ambulance.elements.driverWoman.style.visibility = 'hidden';
+	ambulance.elements.driverMan.style.visibility = 'hidden';
+
+	switch (gender) {
+		case "female":
+			ambulance.elements.driverWoman.style.visibility = 'visible';
+			break;
+
+		case "male":
+			ambulance.elements.driverMan.style.visibility = 'visible';
+			break;
+	}
+
+	// reset the car if it was stopped through timeout
+	Velocity.hook(ambulance.elements.carSignVertical, 'opacity', '1');
+
+	ambulance.elements.carSignRotateLeft.style.fill = '';
+	ambulance.elements.carSignRotateRight.style.fill = '';
+
+	Velocity.hook(ambulance.elements.carSignRotateLeft, 'rotateZ', '-60deg');
+	// Velocity.hook(ambulance.elements.carSignRotateLeft, 'fill', '#58AACF');
+
+	Velocity.hook(ambulance.elements.carSignRotateRight, 'rotateZ', '60deg');
+	// Velocity.hook(ambulance.elements.carSignRotateRight, 'fill', '#58AACF');
+	Velocity.hook(ambulance.elements.carSignRotateRight, 'translateX', '0');
+	Velocity.hook(ambulance.elements.carSignRotateRight, 'scaleY', '1');
+
+
+	ambulance.elements.carBackground.style.fill = '';
+	// Velocity.hook(ambulance.elements.carBackground, 'fill', '#FEF5E4');
+
+	Velocity.hook(ambulance.elements.siren, 'translateY', '0px');
+
+	ambulance.elements.carBandHorizontal.style.fill = '';
+	ambulance.elements.carBandVertical.style.fill = '';
+	ambulance.elements.carBandVerticalPart.style.fill = '';
+
+	// Velocity.hook(ambulance.elements.carBandHorizontal, 'fill', '#EB5151');
+	// Velocity.hook(ambulance.elements.carBandVertical, 'fill', '#EFE4CE');
+	// Velocity.hook(ambulance.elements.carBandVerticalPart, 'fill', '#C84648');
+
+	ambulance.elements.wheelFrontRim.style.fill = '';
+	ambulance.elements.wheelBackRim.style.fill = '';
+	ambulance.elements.wheelFrontRimHighlight.style.fill = '';
+	ambulance.elements.wheelBackRimHighlight.style.fill = '';
+	// Velocity.hook([ambulance.elements.wheelBackRim, ambulance.elements.wheelFrontRim], 'fill', '#453D30');
+	// Velocity.hook([ambulance.elements.wheelBackRimHighlight, ambulance.elements.wheelFrontRimHighlight], 'fill', '#5E564B');
+
+	ambulance.elements.carWindow.style.fill = '';
+
 
 	// initialize start position of the car
 	Velocity.hook(ambulance.elements.group, 'translateX', '0px');
@@ -94,7 +252,8 @@ ambulance.start = function() {
 
 	// add horizontal motion to the car
 	Velocity(ambulance.elements.group, {
-		translateX: [760, 0]
+		translateX: [760, 0],
+		translateY: [0, 0]
 	}, {
 		duration: 1000,
 		easing: "ease-in"
@@ -113,19 +272,12 @@ ambulance.start = function() {
 	rotateWheel(ambulance.elements.wheelFront, 0);
 	rotateWheel(ambulance.elements.wheelBack, 0);
 
-	// increase the size of the hospital
-	Velocity(hospital.elements.group, {
-		scale: [1, 0.5]
-	}, {
-		duration: 9000,
-		delay: 500,
-		easing: 'linear'
-	});
-
 };
 
 // bump the ambulance on wire contact
 ambulance.bump = function() {
+
+	Velocity([ambulance.elements.car, ambulance.elements.protest], 'finish');
 
 	Velocity.hook(ambulance.elements.car, 'rotateY', '0deg');
 	Velocity.hook(ambulance.elements.car, 'scale', '1');
@@ -177,17 +329,20 @@ ambulance.stopEarly = function(rotationDuration, returnDuration) {
 	}, {
 		duration: returnDuration,
 		easing: "ease-in-out",
-		delay: 80
+		delay: 80,
+		complete: function() {
+			Velocity(ambulance.elements.driving, 'stop');
+		}
 	});
 
-	Velocity(hospital.elements.group, 'stop');
-
-	// increase the size of the hospital
-	Velocity(hospital.elements.group, {
-		scale: 0.5
+	// hide the protest sign
+	Velocity(ambulance.elements.protest, {
+		opacity: 0
 	}, {
-		duration: returnDuration - 100,
-		easing: 'linear'
+		duration: 500,
+		complete: function() {
+			Velocity(ambulance.elements.protest, 'stop');
+		}
 	});
 };
 
@@ -278,16 +433,17 @@ ambulance.stopTimeout = function() {
 		easing: 'linear',
 		delay: 100,
 		complete: function() {
-			ambulance.stopEarly(500, 3000);
+			ambulance.stopEarly(500, 4500);
+		}
+	});
 
-			Velocity(hospital.elements.group, 'stop');
-			// increase the size of the hospital
-			Velocity(hospital.elements.group, {
-				scale: 0.5
-			}, {
-				duration: 2000,
-				easing: 'linear'
-			});
+	// hide the protest sign
+	Velocity(ambulance.elements.protest, {
+		opacity: 0
+	}, {
+		duration: 500,
+		complete: function() {
+			Velocity(ambulance.elements.protest, 'stop');
 		}
 	});
 
@@ -295,35 +451,55 @@ ambulance.stopTimeout = function() {
 
 ambulance.stopFinish = function() {
 
+	// open the hospital door
+	Velocity(hospital.elements.door, {
+		translateY: [-100, 0],
+	}, {
+		duration: 300,
+		easing: 'ease-in',
+	});
+
 	// add horizontal motion to the car
 	Velocity(ambulance.elements.group, {
-		translateX: 1860,
-		translateY: -50,
-	}, {
-		duration: 800,
-		easing: [0.455, 0.03, 0.515, 0.955]
-	});
-
-	// stop all previous hopsital group animations
-	Velocity(hospital.elements.group, 'stop');
-
-	// scale the hospital to full size
-	Velocity(hospital.elements.group, {
-		scale: 1
-	}, {
-		duration: 800,
-		easing: [0.455, 0.03, 0.515, 0.955]
-	});
-
-	Velocity(ambulance.elements.car, {
-		scale: 0.5,
+		translateX: 1760,
+		translateY: -110
 	}, {
 		duration: 800,
 		easing: [0.455, 0.03, 0.515, 0.955],
+		queue: false,
+		delay: 300,
+		complete: function() {
+
+			// close the hospital door
+			Velocity(hospital.elements.door, {
+				translateY: 0,
+			}, {
+				duration: 200,
+				easing: 'ease-out-quad',
+			});
+		}
+	});
+
+	Velocity(ambulance.elements.car, {
+		scale: 0.3,
+	}, {
+		duration: 800,
+		easing: [0.455, 0.03, 0.515, 0.955],
+		delay: 280,
 		complete: function() {
 			Velocity(ambulance.elements.driving, 'stop');
 			Velocity(ambulance.elements.wheelFront, 'stop');
 			Velocity(ambulance.elements.wheelBack, 'stop');
+		}
+	});
+
+	// hide the protest sign
+	Velocity(ambulance.elements.protest, {
+		opacity: 0
+	}, {
+		duration: 500,
+		complete: function() {
+			Velocity(ambulance.elements.protest, 'stop');
 		}
 	});
 

@@ -1,9 +1,18 @@
 body {
   background-color: #efefef;
   font-family: "Open Sans", "Source Code Pro", "Helvetica Neue", "Helvetica";
-  font-weight: 300; }
+  font-weight: 300;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  height: 100%;
+  width: 100%;
+  margin: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+  background: #EAEBEC; }
 
 #container {
+  box-sizing: border-box;
   width: 100%;
   height: 100%;
   max-width: 1632px;

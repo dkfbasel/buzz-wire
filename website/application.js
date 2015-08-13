@@ -1,4 +1,4 @@
-/* globals hud, ambulance */
+/* globals hud, ambulance, counter, main */
 
 // define some variables to have a ticking timer
 var startTime;
@@ -52,17 +52,21 @@ function handleMessageReceived(event) {
 		case "start":
 
 			// TODO: set the study id
+			hud.elements.id = "234-12";
 
 			// set the number of hits
 			hud.elements.trauma.textContent = "0";
 
-			// start a ticking clock
-			startTime = new Date().getTime();
-			window.clearInterval(timerReference);
-			timerReference = window.setInterval(showTimer, 10);
+			counter.start(function() {
+				// start a ticking clock
+				startTime = new Date().getTime();
+				window.clearInterval(timerReference);
+				timerReference = window.setInterval(showTimer, 10);
 
-			// start the ambulance
-			ambulance.start();
+				// start the ambulance
+				ambulance.start(tokens[2]);
+			});
+
 			break;
 
 		case "contact":
@@ -115,19 +119,22 @@ function connectSocket() {
 
 	// attach a function on opening the socket
 	ws.onopen = function() {
-		console.log('Connected to the game engine')
-	}
+		main.showCounter()
+		console.log('Connected to the game engine');
+	};
 
 	// attach a function on closing the socket
 	ws.onclose = function() {
+		main.showDisconnect();
 		console.log('Closed connection to the game engine');
-	}
+	};
 
 	ws.onmessage = handleMessageReceived;
 
 }
 
 connectSocket();
+
 
 // --- TEST FUNCTIONS ---
 
@@ -139,9 +146,9 @@ function start() {
 
 	// start the ambulance
 	ambulance.start();
-};
+}
 
 function stop() {
 	// clear the ticking clock
 	window.clearInterval(timerReference);
-};
+}
