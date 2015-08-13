@@ -37,7 +37,7 @@ func main() {
 	// ledMan := gpio.NewLedDriver(raspberry, "ledMan", "18")
 
 	// contact with the wire (start- and finish-area)
-	// contactStart := gpio.NewButtonDriver(raspberry, "contactStart", "33")
+	contactStart := gpio.NewButtonDriver(raspberry, "contactStart", "33")
 	contactFinish := gpio.NewButtonDriver(raspberry, "contactFinish", "36")
 
 	// user made contact with the wire (use buzzer to indicate audible)
@@ -66,8 +66,7 @@ func main() {
 		gobot.On(contactWire.Event("push"), handleWireContact)
 
 		// user is starting the game (must touch the starting area)
-		// TODO: add handler for starting event
-		// gobot.On(contactStart.Event("push"), handleStartContact)
+		gobot.On(contactStart.Event("push"), handleStartContact)
 
 		// user finished the game (touched finish area)
 		gobot.On(contactFinish.Event("push"), handleFinishContact)
@@ -133,7 +132,7 @@ func main() {
 		// all other modes are run on the pi with physical connections
 		robot = gobot.NewRobot("buzzwire",
 			[]gobot.Connection{raspberry},
-			[]gobot.Device{buttonWoman, ledWoman, contactWire, buzzer, contactFinish},
+			[]gobot.Device{buttonWoman, ledWoman, contactStart, contactWire, buzzer, contactFinish},
 			work)
 	}
 
