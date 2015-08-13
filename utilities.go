@@ -26,7 +26,10 @@ func setState(state State) {
 // signal will send an asynchronous signal on the signal channel
 func signal(message string) {
 	go func() {
-		signalChannel <- message
+		select {
+		case signalChannel <- message:
+		default:
+		}
 	}()
 }
 
