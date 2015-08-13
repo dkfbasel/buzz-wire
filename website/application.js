@@ -45,14 +45,17 @@ function handleMessageReceived(event) {
 	// get the message of the event
 	var message = event.data;
 
+	// log message to the console
+	console.info("Socket:", message);
+
 	// split the message into separate tokens
 	var tokens = message.split("::");
 
 	switch (tokens[1]) {
 		case "start":
 
-			// TODO: set the study id
-			hud.elements.id = "234-12";
+			// set the study id
+			hud.elements.id.textContent = tokens[3];
 
 			// set the number of hits
 			hud.elements.trauma.textContent = "0";
@@ -119,7 +122,7 @@ function connectSocket() {
 
 	// attach a function on opening the socket
 	ws.onopen = function() {
-		main.showCounter()
+		main.showCounter();
 		console.log('Connected to the game engine');
 	};
 

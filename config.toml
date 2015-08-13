@@ -8,3 +8,6 @@ timeout = "20s"
 
 # debouncing of the wire contact
 debounceContact = "300ms"
+
+# set the start number of ids
+startNumber = "2"

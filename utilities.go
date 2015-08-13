@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"math/rand"
 	"os"
 	"strings"
 	"time"
@@ -74,6 +75,12 @@ func debounceContactChannel(interval time.Duration, output chan bool) chan bool 
 	}()
 
 	return input
+}
+
+// random will generate a random number in the given range
+func random(min, max int) int {
+	rand.Seed(time.Now().Unix())
+	return rand.Intn(max-min) + min
 }
 
 // --- TESTING UTILITIES ---

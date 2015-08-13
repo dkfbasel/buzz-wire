@@ -33,7 +33,7 @@ func startServer(address string) {
 	server.ServeFile("/style.scss", "website/style.scss")
 
 	// handle websocket connections
-	server.WebSocket("/ws", handleSocketConnection)
+	server.WebSocket("/ws", establishSocketConnection)
 
 	// open the page in the default browser
 	// go openInDefaultBrowser(address)
@@ -49,20 +49,27 @@ func showIndexPage(c *echo.Context) error {
 
 // handleSocketConnection will handle the live connection between the webpage
 // and our game
-func handleSocketConnection(c *echo.Context) error {
+func establishSocketConnection(c *echo.Context) error {
 
 	// upgrade the connection to a socket
 	ws := c.Socket()
 
 	// send signals to client if something is put on the signalChannel
-	// note: signalChannel will block until next receive
+	// note: signalChannel will wait for the next receive
 	for signal := range signalChannel {
-		websocket.Message.Send(ws, signal)
-		fmt.Println("SIGNAL:", signal)
+
+		if ws != (*websocket.Conn)(nil) {
+			websocket.Message.Send(ws, signal)
+			fmt.Println("SIGNAL:", signal)
+
+		} else {
+			fmt.Println("NO CLIENT CONNECTED:", signal)
+
+		}
+
 	}
 
 	return nil
-
 }
 
 // openInDefaultBrowser will open the given address in the users default browser

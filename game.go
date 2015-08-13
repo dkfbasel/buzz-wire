@@ -4,45 +4,8 @@ import (
 	"fmt"
 	"log"
 	"strconv"
-	"sync"
 	"time"
 )
-
-// define our game states
-type State string
-
-const IS_RUNNING State = "running"
-const IS_STOPPED State = "stopped"
-
-// define our stop reasons
-type StopReason string
-
-const FINISHED StopReason = "finished"
-const TIMEOUT StopReason = "timeout"
-const STOPPED StopReason = "stopped"
-
-// define the genders available in our application
-type Gender string
-
-const MALE Gender = "male"
-const FEMALE Gender = "female"
-
-// current state of the game
-var GameState State
-
-// define the time the user has to complete the game
-var Timeout time.Duration
-
-// define some communication channels
-var contactChannel chan bool          // a channel to register all contacts with the wire
-var contactChannelDebounced chan bool // a debouncer for our contact channel
-var startChannel chan bool            // a channel to register touching the start area
-var finishChannel chan StopReason     // a channel to register finish events (from user or timeout)
-
-var DebounceContact time.Duration // how long should the contact channel be debounced
-
-// lock concurrent access to the shared variables
-var Mutex *sync.RWMutex
 
 // --- EVENT HANDLERS FOR USER INTERACTION ---
 
@@ -68,7 +31,7 @@ func handleButtonPress(gender Gender) {
 
 }
 
-// handleStartContact will make sure, that the users is starting from the
+// handleStartContact will make sure, that the user is starting from the
 // beginning of the wire
 func handleStartContact(s interface{}) {
 	// send a signal down the start channel
@@ -120,9 +83,16 @@ func handleFinishContact(s interface{}) {
 // startGame will start a new round
 func startGame(gender Gender) {
 
+	// clear the console output
+	fmt.Print("\033[H\033[2J")
+
+	// generate a new study id
+	studyNumber := strconv.Itoa(random(1000, 9999))
+	studyID := StartNumberOfID + studyNumber[0:2] + "-" + studyNumber[2:4]
+
 	// signal the webserver that we are about to start the game
-	signal("game::start::" + string(gender))
-	fmt.Println("game almost started")
+	signal("game::start::" + string(gender) + "::" + studyID)
+	fmt.Println("game countdown started")
 
 	// initialize the start time and touch counter
 	touchCounter := 0
@@ -130,8 +100,7 @@ func startGame(gender Gender) {
 	// set the game state
 	setState(IS_RUNNING)
 
-	fmt.Print("\033[H\033[2J")
-
+	// initialize a channel to end the game-round
 	done := make(chan struct{})
 
 	// define the led event to use (male or female)
@@ -153,7 +122,7 @@ func startGame(gender Gender) {
 	startTime := time.Now()
 
 	// create a separate go-routine for our ticker
-	go func(startTime time.Time, done <-chan struct{}) {
+	go func(startTime time.Time, studyID string, done <-chan struct{}) {
 		fmt.Println("game started")
 		for {
 			select {
@@ -171,9 +140,9 @@ func startGame(gender Gender) {
 			}
 		}
 
-	}(startTime, done)
+	}(startTime, studyID, done)
 
-	// increase the touch counter on every touch
+	// increase the touch counter on every touch and react to finish events
 	go func(startTime time.Time, counter int, gender Gender, done chan struct{}) {
 
 		// check if the user touched the start of the wire
