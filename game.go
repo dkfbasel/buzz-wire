@@ -125,7 +125,6 @@ func startGame(gender Gender) {
 	fmt.Println("game almost started")
 
 	// initialize the start time and touch counter
-	startTime := time.Now()
 	touchCounter := 0
 
 	// set the game state
@@ -148,6 +147,10 @@ func startGame(gender Gender) {
 	case GameEvents <- ledEvent:
 	default:
 	}
+
+	// wait three seconds for the counter to finish
+	<-time.After(3 * time.Second)
+	startTime := time.Now()
 
 	// create a separate go-routine for our ticker
 	go func(startTime time.Time, done <-chan struct{}) {
