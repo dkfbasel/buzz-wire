@@ -3,6 +3,7 @@
 
 # COPY TO RASPBERRY PI
 > scp pi-uninacht pi@192.168.2.22:/home/pi/uninacht
+> scp ./website/* pi@192.168.2.22:/home/pi/uninacht/website
 
 # COMBINED INTO ONE COMMAND
 > GOARM=6 GOARCH=arm GOOS=linux go build -o=pi-uninacht . | scp pi-uninacht pi@192.168.2.22:/home/pi/uninacht
@@ -15,8 +16,13 @@
 > ssh pi@192.168.2.22
 > ./pi-uninacht
 
-# RUN FIREFOX (ICEWEASEL) ON THE DISPLAY
-> iceweasel --display=:0 http://localhost:8484
+# RUN FIREFOX (ICEWEASEL) FULLSCREEN ON THE DISPLAY
+> iceweasel --display=:0 http://localhost:8484 --fullscreen
+
+# INSTALL CHROMIUM
+> sudo apt-get update
+> sudo apt-get install chromium
+
 
 # PHYSICAL CONNECTIONS
 see pin assignment on http://pi.gadgetoid.com/pinout
