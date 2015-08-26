@@ -277,19 +277,24 @@ ambulance.start = function(gender) {
 // bump the ambulance on wire contact
 ambulance.bump = function() {
 
-	Velocity([ambulance.elements.car, ambulance.elements.protest], 'finish');
+	Velocity([ambulance.elements.protest], 'finish');
 
-	Velocity.hook(ambulance.elements.car, 'rotateY', '0deg');
-	Velocity.hook(ambulance.elements.car, 'scale', '1');
+	// NOTE: somehow there is a problem with the car rotation when
+	// trying to animate a car bump. In addition, the RaspberryPi
+	// seems to have performance problems with it.
 
-	Velocity(ambulance.elements.car, {
-		translateY: [-15, 0],
-	}, {
-		duration: 70,
-		easing: "ease-out-bounce",
-		loop: 2,
-		queue: false
-	});
+	// Velocity.hook(ambulance.elements.car, 'rotateY', '0deg');
+	// Velocity.hook(ambulance.elements.car, 'scale', '1');
+	//
+	// Velocity(ambulance.elements.car, {
+	// 	rotateY: [0, 0],
+	// 	translateY: [-15, 0],
+	// }, {
+	// 	duration: 70,
+	// 	easing: "ease-out-bounce",
+	// 	loop: 2,
+	// 	queue: false
+	// });
 
 	Velocity(ambulance.elements.protest, {
 		opacity: [1, 0]
