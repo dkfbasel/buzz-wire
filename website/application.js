@@ -1,4 +1,4 @@
-/* globals hud, ambulance, counter, main */
+/* globals hud, ambulance, counter, main, _ */
 
 // define some variables to have a ticking timer
 var startTime;
@@ -79,7 +79,10 @@ function handleMessageReceived(event) {
 			hud.elements.trauma.textContent = tokens[2];
 
 			// bump the ambulance
-			ambulance.bump();
+			_.debounce(ambulance.bump(), 800, {
+				'leading': true,
+				'trailing': false
+			});
 			break;
 
 		case "finished":

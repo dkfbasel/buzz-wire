@@ -166,3 +166,10 @@ func padLeft(s string, padStr string, overallLen int) string {
 	var retStr = strings.Repeat(padStr, padCountInt) + s
 	return retStr[(len(retStr) - overallLen):]
 }
+
+// debug will print a message to the console if in debug mode
+func debug(text string) {
+	if Mode == "debug" {
+		fmt.Println(text)
+	}
+}

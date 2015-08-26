@@ -28,6 +28,7 @@ func startServer(address string) {
 	server.Index("website/index.html")
 
 	server.ServeFile("/velocity.min.js", "website/velocity.min.js")
+	server.ServeFile("/lodash.min.js", "website/lodash.min.js")
 	server.ServeFile("/animations.js", "website/animations.js")
 	server.ServeFile("/application.js", "website/application.js")
 
@@ -75,7 +76,7 @@ func handleSocketPool() {
 // registerInSocketPool will register the given channel in the map of socket
 // connections using the uniqueSocketID as identifier
 func registerInSocketPool(uniqueSocketID string, socketChannel chan string) {
-	fmt.Println("SOCKET ADDED:", uniqueSocketID)
+	debug("SOCKET ADDED: " + uniqueSocketID)
 	socketMutex.Lock()
 	socketPool[uniqueSocketID] = socketChannel
 	socketMutex.Unlock()
@@ -84,7 +85,7 @@ func registerInSocketPool(uniqueSocketID string, socketChannel chan string) {
 // removeFromSocketPool will delete the connection with the given id from the
 // pool of socket connections
 func removeFromSocketPool(uniqueSocketID string) {
-	fmt.Println("SOCKET REMOVED:", uniqueSocketID)
+	debug("SOCKET REMOVED: " + uniqueSocketID)
 	socketMutex.Lock()
 	delete(socketPool, uniqueSocketID)
 	socketMutex.Unlock()
@@ -111,7 +112,7 @@ func establishSocketConnection(c *echo.Context) error {
 	for signal := range socketChannel {
 
 		if ws != (*websocket.Conn)(nil) {
-			fmt.Println("SIGNAL:", signal)
+			debug("SIGNAL: " + signal)
 
 			// try to send the signal on the websocket
 			err := websocket.Message.Send(ws, signal)
@@ -125,7 +126,7 @@ func establishSocketConnection(c *echo.Context) error {
 			}
 
 		} else {
-			fmt.Println("NO CLIENT CONNECTED:", signal)
+			debug("NO CLIENT CONNECTED: " + signal)
 
 			// remove the socket from the pool
 			removeFromSocketPool(uniqueSocketID)

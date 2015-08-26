@@ -44,11 +44,11 @@ func handleStartContact(s interface{}) {
 // handleWireContact will be called whenever the user
 // touches the wire
 func handleWireContact(s interface{}) {
-	log.Println("wire touched")
+	debug("wire touched")
 	currentState := getState()
 
 	if currentState != IS_RUNNING {
-		fmt.Println("the timer is currently not running")
+		debug("the timer is currently not running")
 		return
 	}
 
@@ -62,11 +62,11 @@ func handleWireContact(s interface{}) {
 // handleFinishContact will be called whenever the user
 // is touching the finish platform
 func handleFinishContact(s interface{}) {
-	log.Println("game finished")
+	debug("game finished")
 	currentState := getState()
 
 	if currentState != IS_RUNNING {
-		fmt.Println("the timer is currently not running")
+		debug("the timer is currently not running")
 		return
 	}
 
@@ -92,7 +92,7 @@ func startGame(gender Gender) {
 
 	// signal the webserver that we are about to start the game
 	signal("game::countdown::" + string(gender) + "::" + studyID)
-	fmt.Println("game countdown started")
+	debug("game countdown started")
 
 	// initialize the start time and touch counter
 	touchCounter := 0
@@ -122,7 +122,7 @@ func startGame(gender Gender) {
 
 	// create a separate go-routine for our ticker
 	go func(startTime time.Time, studyID string, done <-chan struct{}) {
-		fmt.Println("game started")
+		debug("game started")
 		for {
 			select {
 			// create a ticker to check the time in regular timespans
@@ -150,25 +150,29 @@ func startGame(gender Gender) {
 		for {
 			select {
 			case <-startChannel:
+
+				// ignore touching the start channel if the game is already started
+				if startTouched == true {
+					break
+				}
+
 				if time.Now().Before(startTime) {
-					fmt.Println("wait for timer to finish")
+					debug("wait for timer to finish")
 					break
 				}
 
 				// start region was touched after the timer finished
-				fmt.Println("start region touched")
+				debug("start region touched")
 				startTouched = true
 
 				// signal the server, that the game should start
 				signalChannel <- "game::start::" + string(gender)
 
 			case <-contactChannel:
-				fmt.Println("register contact")
+				debug("register contact")
 
-				// TODO: enable checking for start contact
 				// check if the start region has been touched before
 				if startTouched == false {
-					fmt.Println("BEEP: start region not touched yet")
 					break
 				}
 
@@ -186,6 +190,11 @@ func startGame(gender Gender) {
 
 			case reason := <-finishChannel:
 
+				// only react to events if the run was correctly started
+				if startTouched == false {
+					break
+				}
+
 				timeElapsed := time.Now().Sub(startTime)
 
 				// signal the webserver that the game was finished
@@ -201,7 +210,7 @@ func startGame(gender Gender) {
 				close(done)
 
 			case <-done:
-				fmt.Println("game was finished..")
+				debug("game was finished..")
 				select {
 				case GameEvents <- "ledOff":
 				default:

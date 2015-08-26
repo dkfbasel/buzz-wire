@@ -29,8 +29,8 @@ func main() {
 	raspberry := raspi.NewRaspiAdaptor("raspi")
 
 	// start/stop button for a woman
-	buttonWoman := gpio.NewButtonDriver(raspberry, "buttonWoman", "7") // GPIO #4 (High), alternative #17 (Low)
-	ledWoman := gpio.NewLedDriver(raspberry, "ledWoman", "36")         // GPIO #16 (Low)
+	buttonWoman := gpio.NewButtonDriver(raspberry, "buttonWoman", "11") // GPIO #17 (Low)
+	ledWoman := gpio.NewLedDriver(raspberry, "ledWoman", "36")          // GPIO #16 (Low)
 
 	// start/stop buttom for a man
 	// buttonMan := gpio.NewButtonDriver(raspberry, "buttonMan", "12") // GPIO #18 (Low)
@@ -42,7 +42,7 @@ func main() {
 
 	// user made contact with the wire (use buzzer to indicate audible)
 	contactWire := gpio.NewButtonDriver(raspberry, "contactWire", "16") // GPIO #23 (Low)
-	buzzer := gpio.NewLedDriver(raspberry, "buzzer", "31")              // GPIO #6 (High), alternative #12 (Low)
+	buzzer := gpio.NewLedDriver(raspberry, "buzzer", "32")              // GPIO #12 (Low)
 
 	// create a channel for game events
 	GameEvents = make(chan string)

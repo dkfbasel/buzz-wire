@@ -287,7 +287,8 @@ ambulance.bump = function() {
 	}, {
 		duration: 70,
 		easing: "ease-out-bounce",
-		loop: 2
+		loop: 2,
+		queue: false
 	});
 
 	Velocity(ambulance.elements.protest, {
@@ -295,11 +296,13 @@ ambulance.bump = function() {
 	}, {
 		duration: 200,
 		delay: 50,
+		queue: false,
 		easing: "swing",
 		complete: function() {
 			Velocity(ambulance.elements.protest, 'reverse', {
 				duration: 200,
-				delay: 400
+				delay: 400,
+				queue: false
 			});
 		}
 	});
@@ -316,6 +319,8 @@ ambulance.stopEarly = function(rotationDuration, returnDuration) {
 	if (!rotationDuration) {
 		rotationDuration = 120;
 	}
+
+	Velocity([ambulance.elements.car, ambulance.elements.protest], 'finish');
 
 	Velocity(ambulance.elements.car, {
 		rotateY: [180, 0],
@@ -349,6 +354,8 @@ ambulance.stopEarly = function(rotationDuration, returnDuration) {
 
 // games is stopped due to timeout (convert ambulance into hearse-car)
 ambulance.stopTimeout = function() {
+
+	Velocity([ambulance.elements.car, ambulance.elements.protest], 'finish');
 
 	Velocity.hook(ambulance.elements.carSignVertical, 'opacity', '0');
 
@@ -451,12 +458,15 @@ ambulance.stopTimeout = function() {
 
 ambulance.stopFinish = function() {
 
+	Velocity([ambulance.elements.car, ambulance.elements.protest], 'finish');
+
 	// open the hospital door
 	Velocity(hospital.elements.door, {
 		translateY: [-100, 0],
 	}, {
 		duration: 300,
 		easing: 'ease-in',
+		queue: false
 	});
 
 	// add horizontal motion to the car
@@ -484,6 +494,7 @@ ambulance.stopFinish = function() {
 		scale: 0.3,
 	}, {
 		duration: 800,
+		queue: false,
 		easing: [0.455, 0.03, 0.515, 0.955],
 		delay: 280,
 		complete: function() {
@@ -498,6 +509,7 @@ ambulance.stopFinish = function() {
 		opacity: 0
 	}, {
 		duration: 500,
+		queue: false,
 		complete: function() {
 			Velocity(ambulance.elements.protest, 'stop');
 		}
