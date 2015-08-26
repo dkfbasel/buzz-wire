@@ -59,7 +59,7 @@ func debounceContactChannel(interval time.Duration, output chan bool) chan bool 
 			select {
 			// we wait for a signal or closing of the input channel
 			case buffer, ok = <-input:
-				fmt.Println("debounced ..")
+				debug("debounced contact")
 
 				// exit if the input channel was closed
 				if !ok {

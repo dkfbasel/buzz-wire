@@ -191,7 +191,7 @@ func startGame(gender Gender) {
 			case reason := <-finishChannel:
 
 				// only react to events if the run was correctly started
-				if startTouched == false {
+				if startTouched == false && reason == FINISHED {
 					break
 				}
 
