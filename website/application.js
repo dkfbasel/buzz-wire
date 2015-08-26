@@ -52,7 +52,7 @@ function handleMessageReceived(event) {
 	var tokens = message.split("::");
 
 	switch (tokens[1]) {
-		case "start":
+		case "countdown":
 
 			// set the study id
 			hud.elements.id.textContent = tokens[3];
@@ -65,11 +65,13 @@ function handleMessageReceived(event) {
 				startTime = new Date().getTime();
 				window.clearInterval(timerReference);
 				timerReference = window.setInterval(showTimer, 10);
-
-				// start the ambulance
-				ambulance.start(tokens[2]);
 			});
 
+			break;
+
+		case "start":
+			// start the ambulance, once the user touched the start region
+			ambulance.start(tokens[2]);
 			break;
 
 		case "contact":
@@ -130,12 +132,15 @@ function connectSocket() {
 	ws.onclose = function() {
 		main.showDisconnect();
 		console.log('Closed connection to the game engine');
+
+		// try to reconnect to the socket
+		connectSocket();
 	};
 
 	ws.onmessage = handleMessageReceived;
-
 }
 
+// automatically connect when opening the page
 connectSocket();
 
 

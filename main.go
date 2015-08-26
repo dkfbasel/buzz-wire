@@ -29,20 +29,20 @@ func main() {
 	raspberry := raspi.NewRaspiAdaptor("raspi")
 
 	// start/stop button for a woman
-	buttonWoman := gpio.NewButtonDriver(raspberry, "buttonWoman", "11")
-	ledWoman := gpio.NewLedDriver(raspberry, "ledWoman", "12")
+	buttonWoman := gpio.NewButtonDriver(raspberry, "buttonWoman", "7") // GPIO #4 (High), alternative #17 (Low)
+	ledWoman := gpio.NewLedDriver(raspberry, "ledWoman", "36")         // GPIO #16 (Low)
 
 	// start/stop buttom for a man
-	// buttonMan := gpio.NewButtonDriver(raspberry, "buttonMan", "32")
-	// ledMan := gpio.NewLedDriver(raspberry, "ledMan", "18")
+	// buttonMan := gpio.NewButtonDriver(raspberry, "buttonMan", "12") // GPIO #18 (Low)
+	// ledMan := gpio.NewLedDriver(raspberry, "ledMan", "40") // GPIO #21 (Low)
 
 	// contact with the wire (start- and finish-area)
-	contactStart := gpio.NewButtonDriver(raspberry, "contactStart", "33")
-	contactFinish := gpio.NewButtonDriver(raspberry, "contactFinish", "36")
+	contactStart := gpio.NewButtonDriver(raspberry, "contactStart", "13")   // GPIO #27 (Low)
+	contactFinish := gpio.NewButtonDriver(raspberry, "contactFinish", "22") // GPIO #25 (Low)
 
 	// user made contact with the wire (use buzzer to indicate audible)
-	contactWire := gpio.NewButtonDriver(raspberry, "contactWire", "15")
-	buzzer := gpio.NewLedDriver(raspberry, "buzzer", "16")
+	contactWire := gpio.NewButtonDriver(raspberry, "contactWire", "16") // GPIO #23 (Low)
+	buzzer := gpio.NewLedDriver(raspberry, "buzzer", "31")              // GPIO #6 (High), alternative #12 (Low)
 
 	// create a channel for game events
 	GameEvents = make(chan string)
@@ -110,6 +110,11 @@ func main() {
 					handleStartContact(nil)
 				case "finish":
 					handleFinishContact(nil)
+
+				case "off":
+					// ledMan.Off()
+					ledWoman.Off()
+					buzzer.Off()
 				}
 			}
 		}()

@@ -91,7 +91,7 @@ func startGame(gender Gender) {
 	studyID := StartNumberOfID + studyNumber[0:2] + "-" + studyNumber[2:4]
 
 	// signal the webserver that we are about to start the game
-	signal("game::start::" + string(gender) + "::" + studyID)
+	signal("game::countdown::" + string(gender) + "::" + studyID)
 	fmt.Println("game countdown started")
 
 	// initialize the start time and touch counter
@@ -118,8 +118,7 @@ func startGame(gender Gender) {
 	}
 
 	// wait three seconds for the counter to finish
-	<-time.After(3 * time.Second)
-	startTime := time.Now()
+	startTime := time.Now().Add(3 * time.Second)
 
 	// create a separate go-routine for our ticker
 	go func(startTime time.Time, studyID string, done <-chan struct{}) {
@@ -151,8 +150,17 @@ func startGame(gender Gender) {
 		for {
 			select {
 			case <-startChannel:
+				if time.Now().Before(startTime) {
+					fmt.Println("wait for timer to finish")
+					break
+				}
+
+				// start region was touched after the timer finished
 				fmt.Println("start region touched")
 				startTouched = true
+
+				// signal the server, that the game should start
+				signalChannel <- "game::start::" + string(gender)
 
 			case <-contactChannel:
 				fmt.Println("register contact")
@@ -160,8 +168,8 @@ func startGame(gender Gender) {
 				// TODO: enable checking for start contact
 				// check if the start region has been touched before
 				if startTouched == false {
-					// fmt.Println("BEEP: start region not touched yet")
-					// break
+					fmt.Println("BEEP: start region not touched yet")
+					break
 				}
 
 				// increase the touch counter
