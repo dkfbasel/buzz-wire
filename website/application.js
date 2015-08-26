@@ -4,6 +4,8 @@
 var startTime;
 var timerReference;
 
+// the amount of time available to complete the game
+var timeLimit = 25;
 
 function remainingTime(limit, durationInMillisecs) {
 
@@ -36,7 +38,7 @@ function showTimer() {
 	var currentTime = new Date().getTime();
 	var durationInMillisecs = currentTime - startTime;
 
-	hud.elements.time.textContent = remainingTime(20, durationInMillisecs);
+	hud.elements.time.textContent = remainingTime(timeLimit, durationInMillisecs);
 }
 
 
@@ -99,7 +101,7 @@ function handleMessageReceived(event) {
 					ambulance.stopFinish();
 
 					var elapsedTime = parseFloat(tokens[3]) * 1000;
-					hud.elements.time.textContent = remainingTime(20, elapsedTime);
+					hud.elements.time.textContent = remainingTime(timeLimit, elapsedTime);
 
 					break;
 
