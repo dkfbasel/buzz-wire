@@ -87,8 +87,7 @@ func startGame(gender Gender) {
 	fmt.Print("\033[H\033[2J")
 
 	// generate a new study id
-	studyNumber := strconv.Itoa(random(1000, 9999))
-	studyID := StartNumberOfID + studyNumber[0:2] + "-" + studyNumber[2:4]
+	studyID := generateNewStudyID()
 
 	// signal the webserver that we are about to start the game
 	signal("game::countdown::" + string(gender) + "::" + studyID)
@@ -142,7 +141,7 @@ func startGame(gender Gender) {
 	}(startTime, studyID, done)
 
 	// increase the touch counter on every touch and react to finish events
-	go func(startTime time.Time, counter int, gender Gender, done chan struct{}) {
+	go func(startTime time.Time, counter int, gender Gender, studyID string, done chan struct{}) {
 
 		// check if the user touched the start of the wire
 		var startTouched bool
@@ -196,15 +195,19 @@ func startGame(gender Gender) {
 				}
 
 				timeElapsed := time.Now().Sub(startTime)
+				timeElapsedInSeconds := strconv.FormatFloat(timeElapsed.Seconds(), 'f', 3, 64)
 
 				// signal the webserver that the game was finished
-				signalChannel <- "game::finished::" + string(reason) + "::" + strconv.FormatFloat(timeElapsed.Seconds(), 'f', 3, 64)
+				signalChannel <- "game::finished::" + string(reason) + "::" + timeElapsedInSeconds
 
 				// set the state of the game to stopped
 				setState(IS_STOPPED)
 
 				// print the results
-				fmt.Printf(resultLog, gender, reason, timeElapsed.Seconds(), counter)
+				fmt.Printf(resultLog, gender, reason, timeElapsedInSeconds, counter)
+
+				// save the results to the output file
+				saveResultToDisk(studyID, string(gender), timeElapsedInSeconds, strconv.Itoa(counter), string(reason))
 
 				// close our waiting channel
 				close(done)
@@ -219,6 +222,6 @@ func startGame(gender Gender) {
 			}
 		}
 
-	}(startTime, touchCounter, gender, done)
+	}(startTime, touchCounter, gender, studyID, done)
 
 }

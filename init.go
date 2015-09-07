@@ -8,6 +8,10 @@ import (
 	"github.com/spf13/viper"
 )
 
+const outputFile = "./results.csv"
+
+var idsInUse map[string]bool
+
 // define our game states
 type State string
 
@@ -88,5 +92,8 @@ func initConfiguration() {
 
 	// handle finish events
 	finishChannel = make(chan StopReason)
+
+	// parse all existing results
+	idsInUse, _ = parseExistingStudyResults()
 
 }

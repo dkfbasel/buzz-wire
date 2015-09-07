@@ -3,8 +3,10 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io/ioutil"
 	"math/rand"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -172,4 +174,84 @@ func debug(text string) {
 	if Mode == "debug" {
 		fmt.Println(text)
 	}
+}
+
+// saveResultToDisk will save the given result to the file system
+func saveResultToDisk(studyID string, gender string, duration string, hits string, stopReason string) {
+
+	var file *os.File
+
+	// try to get file statistics (to check whether file exists)
+	_, err := os.Stat(outputFile)
+
+	// create a new file or append the exisiting
+	if os.IsNotExist(err) {
+		if file, err = os.Create(outputFile); err != nil {
+			debug("could not create the output file: " + err.Error())
+			return
+		}
+		defer file.Close()
+		// add the column description as first entry
+		file.WriteString("studyid;gender;duration;hits;stopreason\n")
+
+	} else {
+		if file, err = os.OpenFile(outputFile, os.O_APPEND|os.O_WRONLY, 0600); err != nil {
+			debug("could not open the output file: " + err.Error())
+			return
+		}
+		defer file.Close()
+	}
+
+	if _, err = file.WriteString(studyID + ";" + gender + ";" + duration + ";" + hits + ";" + stopReason + "\n"); err != nil {
+		debug("could not write to the output file: " + err.Error())
+	}
+
+}
+
+// parseExistingStudyResults will try to read all existing study results from
+// the result file and create a map of study-ids already in use
+func parseExistingStudyResults() (map[string]bool, error) {
+
+	idMap := make(map[string]bool)
+
+	content, err := ioutil.ReadFile(outputFile)
+	if err != nil {
+		return idMap, err
+	}
+
+	// split the file content into separate lines
+	lines := strings.Split(string(content), "\n")
+
+	// extract the study id from each line
+	for index, line := range lines {
+
+		// skip the first line
+		if index == 0 {
+			continue
+		}
+
+		// split the line into separate rows
+		rows := strings.Split(line, ";")
+
+		// select the study id (first row)
+		idMap[rows[0]] = true
+	}
+
+	return idMap, nil
+}
+
+// generateNewStudyId will generate a new study id that is not already in use
+func generateNewStudyID() string {
+	studyNumber := strconv.Itoa(random(1000, 9999))
+	studyID := StartNumberOfID + studyNumber[0:2] + "-" + studyNumber[2:4]
+
+	// make sure the id is not already in use
+	if _, ok := idsInUse[studyID]; ok == true {
+		studyID = generateNewStudyID()
+	}
+
+	// add the study id to the map of already used ids
+	idsInUse[studyID] = true
+
+	return studyID
 }
