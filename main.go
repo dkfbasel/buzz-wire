@@ -33,8 +33,8 @@ func main() {
 	ledWoman := gpio.NewLedDriver(raspberry, "ledWoman", "36")          // GPIO #16 (Low)
 
 	// start/stop buttom for a man
-	// buttonMan := gpio.NewButtonDriver(raspberry, "buttonMan", "12") // GPIO #18 (Low)
-	// ledMan := gpio.NewLedDriver(raspberry, "ledMan", "40") // GPIO #21 (Low)
+	buttonMan := gpio.NewButtonDriver(raspberry, "buttonMan", "12") // GPIO #18 (Low)
+	ledMan := gpio.NewLedDriver(raspberry, "ledMan", "40")          // GPIO #21 (Low)
 
 	// contact with the wire (start- and finish-area)
 	contactStart := gpio.NewButtonDriver(raspberry, "contactStart", "13")   // GPIO #27 (Low)
@@ -58,9 +58,9 @@ func main() {
 			handleButtonPress(FEMALE)
 		})
 
-		// gobot.On(buttonMan.Event("push"), func(data interface{}) {
-		// 	handleButtonPress(MALE)
-		// })
+		gobot.On(buttonMan.Event("push"), func(data interface{}) {
+			handleButtonPress(MALE)
+		})
 
 		// user made contact with wire
 		gobot.On(contactWire.Event("push"), handleWireContact)
@@ -91,15 +91,15 @@ func main() {
 					ledWoman.Off()
 
 				// enable/disable the lef for the man button
-				// case "enableLedMan":
-				// 	ledMan.On()
-				// case "disableLedMan":
-				// 	ledMan.Off()
+				case "enableLedMan":
+					ledMan.On()
+				case "disableLedMan":
+					ledMan.Off()
 
 				// disable all leds
 				case "ledOff":
 					ledWoman.Off()
-					// ledMan.Off()
+					ledMan.Off()
 
 				// simulated events
 				case "button":
@@ -112,7 +112,7 @@ func main() {
 					handleFinishContact(nil)
 
 				case "off":
-					// ledMan.Off()
+					ledMan.Off()
 					ledWoman.Off()
 					buzzer.Off()
 				}
@@ -137,7 +137,7 @@ func main() {
 		// all other modes are run on the pi with physical connections
 		robot = gobot.NewRobot("buzzwire",
 			[]gobot.Connection{raspberry},
-			[]gobot.Device{buttonWoman, ledWoman, contactStart, contactWire, buzzer, contactFinish},
+			[]gobot.Device{buttonWoman, ledWoman, buttonMan, ledMan, contactStart, contactWire, buzzer, contactFinish},
 			work)
 	}
 
