@@ -10,11 +10,11 @@ import (
 )
 
 const (
-	MODE_DEBUG string = "debug"
-	MODE_PI    string = "pi"
+	MODE_DEBUG = "debug"
+	MODE_PI    = "pi"
 )
 
-var Mode string = MODE_PI
+var Mode = MODE_PI
 var GameEvents chan string
 
 func main() {
@@ -146,6 +146,9 @@ func main() {
 
 	// start the webserver in a separate go routine
 	go startServer("localhost:8484")
+
+	// open the default webseite
+	go openInDefaultBrowser("localhost:8484")
 
 	// start the robot (blocking)
 	gbot.Start()

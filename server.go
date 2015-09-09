@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
+	"os/exec"
 	"sync"
 	"time"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/pborman/uuid"
-	"github.com/skratchdot/open-golang/open"
 	"golang.org/x/net/websocket"
 )
 
@@ -143,8 +143,9 @@ func establishSocketConnection(c *echo.Context) error {
 // openInDefaultBrowser will open the given address in the users default browser
 // (after a short timeout)
 func openInDefaultBrowser(address string) {
-	<-time.After(100 * time.Millisecond)
-	err := open.Start("http://" + address + "/")
+	<-time.After(1 * time.Second)
+	cmd := exec.Command("iceweasel", "--display=:0", "http://localhost:8484", "--fullscreen")
+	err := cmd.Start()
 	if err != nil {
 		fmt.Println("Bitte öffnen Sie Ihren Browser auf der Adresse", address)
 	}
