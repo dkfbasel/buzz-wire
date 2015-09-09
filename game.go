@@ -107,7 +107,7 @@ func startGame(gender Gender) {
 	if gender == FEMALE {
 		ledEvent = "enableLedWoman"
 	} else {
-		ledEvent = "enalbeLedMan"
+		ledEvent = "enableLedMan"
 	}
 
 	// enable the led light
