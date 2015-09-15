@@ -24,6 +24,8 @@ To compare the two groups, we will calculate a game score for each participant:
 We hypothesize that the performance of the turning group will be worse than the
 performance of the regular group.
 
+<img src="documents/buzz-wire-drawing.jpg">
+
 # DETAILS ON THE BUZZ-WIRE BOX
 coming soon..
 
