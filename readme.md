@@ -16,6 +16,7 @@ In addition the gender of the participant will be recorded (to analyze for gende
 influence on the result).
 
 To compare the two groups, we will calculate a game score for each participant:
+
 1. Starting score is 50 points
 2. The number of seconds to finish is subtracted from the score
 3. The number of wire-contacts is multiplied by the factor 2 and subtracted from the score
