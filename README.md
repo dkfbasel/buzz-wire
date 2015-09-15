@@ -68,7 +68,7 @@ connected to it over ssh with a computer with Go installed (with Go Version >= 1
 > sudo nano /etc/xdg/lxsession/LXDE-pi/autostart
 
 enter the following line BEFORE the line with @xscreensaver:
-@lxterminal --command "/home/pi/uninacht/run.sh"
+> @lxterminal --command "/home/pi/uninacht/run.sh"
 
 
 ## NOTE: TO RUN ICEWEASEL VIA SSH ON THE PI-MONITOR
