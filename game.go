@@ -194,6 +194,11 @@ func startGame(gender Gender) {
 					break
 				}
 
+				// user never started the game and timeout occured
+				if startTouched == false && reason == TIMEOUT {
+					reason = STOPPED
+				}
+
 				timeElapsed := time.Now().Sub(startTime)
 				timeElapsedInSeconds := strconv.FormatFloat(timeElapsed.Seconds(), 'f', 3, 64)
 
