@@ -17,20 +17,20 @@ influence on the result).
 
 To compare the two groups, we will calculate a game score for each participant:
 
-1. Starting score is 50 points
-2. The number of seconds to finish is subtracted from the score
-3. The number of wire-contacts is multiplied by the factor 2 and subtracted from the score
-4. Not finishing the game will result in a score of 0
+1. Starting score 25 points
+2. Add the number of seconds remaining as each 1 point
+3. Multiply the number of wire-contacts by the factor 2 and subtracted from the score
+4. Subtract 20 points if game was not finished
 
 We hypothesize that the performance of the turning group will be worse than the
 performance of the regular group.
 
 <img src="documents/buzz-wire-drawing.jpg">
 
-# DETAILS ON THE BUZZ-WIRE BOX
+# ABBOUT THE BUZZ-WIRE BOX
 coming soon..
 
-# DETAILS ON THE CODE
+# ABOUT THE CODE
 To automatically measure the time required and number of contacts a Raspberry Pi
 (Modell 2) with a custom made program is used.
 
