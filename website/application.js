@@ -1,8 +1,15 @@
-/* globals hud, ambulance, counter, main, _ */
+/* globals hud, ambulance, counter, main, _ , hideResult */
 
 // define some variables to have a ticking timer
 var startTime;
 var timerReference;
+
+var info ={
+	id: null,
+	remaining: null,
+	contacts: null,
+	alive: null
+};
 
 // the amount of time available to complete the game
 var timeLimit = 25;
@@ -41,6 +48,10 @@ function showTimer() {
 	hud.elements.time.textContent = remainingTime(timeLimit, durationInMillisecs);
 }
 
+var debouncedBumping = _.debounce(ambulance.bump, 200, {
+	'leading': true,
+	'trailing': false
+});
 
 function handleMessageReceived(event) {
 
@@ -48,7 +59,7 @@ function handleMessageReceived(event) {
 	var message = event.data;
 
 	// log message to the console
-	console.info("Socket:", message);
+	// console.info("Socket:", message);
 
 	// split the message into separate tokens
 	var tokens = message.split("::");
@@ -56,8 +67,16 @@ function handleMessageReceived(event) {
 	switch (tokens[1]) {
 		case "countdown":
 
+			hideResult();
+
+			info.id = tokens[3];
+			info.alive = 1;
+			info.contacts = 0;
+
 			// set the study id
 			hud.elements.id.textContent = tokens[3];
+			hud.elements.resultId.textContent = tokens[3];
+			hud.elements.resultPoints.textContent = "25";
 
 			// set the number of hits
 			hud.elements.trauma.textContent = "0";
@@ -79,12 +98,11 @@ function handleMessageReceived(event) {
 		case "contact":
 			// show the number of contacts with the wire
 			hud.elements.trauma.textContent = tokens[2];
+			info.contacts = tokens[2];
 
 			// bump the ambulance
-			_.debounce(ambulance.bump(), 800, {
-				'leading': true,
-				'trailing': false
-			});
+			// ambulance.bump();
+			debouncedBumping();
 			break;
 
 		case "finished":
@@ -98,17 +116,22 @@ function handleMessageReceived(event) {
 					break;
 
 				case "finished":
-					ambulance.stopFinish();
-
+					info.alive = 1;
 					var elapsedTime = parseFloat(tokens[3]) * 1000;
-					hud.elements.time.textContent = remainingTime(timeLimit, elapsedTime);
+					info.remaining = remainingTime(timeLimit, elapsedTime);
+					hud.elements.time.textContent = info.remaining;
 
+					ambulance.stopFinish();
 					break;
 
 				case "timeout":
+					info.alive = 0;
+					info.remaining = remainingTime(timeLimit, timeLimit * 1000);
+					hud.elements.time.textContent = info.remaining;
 					ambulance.stopTimeout();
 					break;
 			}
+
 	}
 }
 
@@ -147,7 +170,6 @@ function connectSocket() {
 
 // automatically connect when opening the page
 connectSocket();
-
 
 // --- TEST FUNCTIONS ---
 

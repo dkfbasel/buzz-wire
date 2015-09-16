@@ -1,4 +1,4 @@
-/* globals Velocity, console */
+/* globals Velocity, console, info */
 
 // --- INITIALIZE ELEMENTS ---
 
@@ -29,6 +29,7 @@ var ambulance = {
 		protest: document.getElementById('protest'),
 		car: document.getElementById('car-animation'),
 		driving: document.getElementById('car-driving-animation'),
+		bump: document.getElementById('car-bump-animation'),
 		siren: document.getElementById('siren'),
 
 		carBackground: document.getElementById('car-background'),
@@ -71,10 +72,20 @@ var hospital = {
 var hud = {
 	elements: {
 		hud: document.getElementById('hud'),
+		hudBackground: document.getElementById('hud-background'),
+
 		time: document.getElementById('time-content'),
 		trauma: document.getElementById('trauma-content'),
+
+		results: document.getElementById('results'),
+		resultId: document.getElementById('results-study-id-content'),
+		resultPoints: document.getElementById('results-points-content'),
+
 		id: document.getElementById('id-content'),
-		ecg: document.getElementById('ecg-content')
+		ecgRegular: document.getElementById('ecg-content-regular'),
+		ecgFlat: document.getElementById('ecg-content-flat')
+
+
 	},
 	show: null,
 	hide: null
@@ -168,6 +179,87 @@ counter.start = function(callback) {
 	}, 1000);
 
 };
+
+// --- RESULTS ---
+
+function animateScore(start, stop, callbackFn) {
+	var difference = Math.abs(start - stop);
+
+	Velocity(hud.elements.resultPoints, {
+		tween: [stop, start]
+	}, {
+		duration: (difference * 80),
+		easing: "ease-in",
+		delay: 250,
+		progress: function(elements, complete, remaining, startTime, tweenValue) {
+			var value = parseInt(tweenValue, 10);
+			elements[0].textContent = value;
+		},
+		complete: callbackFn
+	});
+}
+
+
+function hideResult() {
+	Velocity.hook(hud.elements.results, 'opacity', '0');
+}
+
+function showResult() {
+
+	// show the results view
+	Velocity(hud.elements.results, {
+		opacity: [1, 1],
+		translateX: [50, -1200],
+		translateY: [195, 195]
+	}, {
+		duration: 400,
+		easing: [80, 11],
+		complete: function() {
+
+			var remainingSeconds = parseInt(info.remaining.split(":")[0], 10);
+
+			// add seconds to score
+			var score1 = 25 + remainingSeconds;
+
+			animateScore(25, score1, function() {
+
+				// remove points for contacts
+				var score2 = score1 - (2 * info.contacts);
+
+				if (score2 < 0) {
+					score2 = 0;
+				}
+
+				if (score2 !== score1) {
+					animateScore(score1, score2, function() {
+
+						var score3 = score2;
+
+						// remove points for dead patient
+						if (info.alive === 0) {
+							score3 = score2 - 20;
+						}
+
+						// score cannot be below zero
+						if (score3 < 0) {
+							score3 = 0;
+						}
+
+						if (score3 !== score2) {
+							animateScore(score2, score3);
+						}
+
+					});
+				}
+
+
+			});
+
+		}
+	});
+
+}
+
 
 // --- AMBULANCE ---
 
@@ -277,7 +369,7 @@ ambulance.start = function(gender) {
 // bump the ambulance on wire contact
 ambulance.bump = function() {
 
-	Velocity([ambulance.elements.protest], 'finish');
+	Velocity([ambulance.elements.protest, ambulance.elements.bump], 'stop');
 
 	// NOTE: somehow there is a problem with the car rotation when
 	// trying to animate a car bump. In addition, the RaspberryPi
@@ -285,16 +377,14 @@ ambulance.bump = function() {
 
 	// Velocity.hook(ambulance.elements.car, 'rotateY', '0deg');
 	// Velocity.hook(ambulance.elements.car, 'scale', '1');
-	//
-	// Velocity(ambulance.elements.car, {
-	// 	rotateY: [0, 0],
-	// 	translateY: [-15, 0],
-	// }, {
-	// 	duration: 70,
-	// 	easing: "ease-out-bounce",
-	// 	loop: 2,
-	// 	queue: false
-	// });
+
+	Velocity(ambulance.elements.bump, {
+		translateY: [-8, 0]
+	}, {
+		duration: 80,
+		easing: "ease-out-bounce",
+		loop: 2
+	});
 
 	Velocity(ambulance.elements.protest, {
 		opacity: [1, 0]
@@ -304,18 +394,19 @@ ambulance.bump = function() {
 		queue: false,
 		easing: "swing",
 		complete: function() {
-			Velocity(ambulance.elements.protest, 'reverse', {
+			Velocity(ambulance.elements.protest, {
+				opacity: 0
+			}, {
 				duration: 200,
-				delay: 400,
+				delay: 300,
 				queue: false
 			});
 		}
 	});
 };
 
-
 // user stopped game early (turn ambulance around)
-ambulance.stopEarly = function(rotationDuration, returnDuration) {
+ambulance.stopEarly = function(rotationDuration, returnDuration, callback) {
 
 	if (!returnDuration) {
 		returnDuration = 1000;
@@ -325,7 +416,7 @@ ambulance.stopEarly = function(rotationDuration, returnDuration) {
 		rotationDuration = 120;
 	}
 
-	Velocity([ambulance.elements.car, ambulance.elements.protest], 'finish');
+	Velocity([ambulance.elements.car, ambulance.elements.protest, ambulance.elements.bump], 'finish');
 
 	Velocity(ambulance.elements.car, {
 		rotateY: [180, 0],
@@ -342,6 +433,9 @@ ambulance.stopEarly = function(rotationDuration, returnDuration) {
 		delay: 80,
 		complete: function() {
 			Velocity(ambulance.elements.driving, 'stop');
+			if (callback) {
+				callback();
+			}
 		}
 	});
 
@@ -360,7 +454,7 @@ ambulance.stopEarly = function(rotationDuration, returnDuration) {
 // games is stopped due to timeout (convert ambulance into hearse-car)
 ambulance.stopTimeout = function() {
 
-	Velocity([ambulance.elements.car, ambulance.elements.protest], 'finish');
+	Velocity([ambulance.elements.car, ambulance.elements.protest, ambulance.elements.bump], 'finish');
 
 	Velocity.hook(ambulance.elements.carSignVertical, 'opacity', '0');
 
@@ -445,7 +539,7 @@ ambulance.stopTimeout = function() {
 		easing: 'linear',
 		delay: 100,
 		complete: function() {
-			ambulance.stopEarly(500, 4500);
+			ambulance.stopEarly(500, 4500, showResult);
 		}
 	});
 
@@ -463,7 +557,7 @@ ambulance.stopTimeout = function() {
 
 ambulance.stopFinish = function() {
 
-	Velocity([ambulance.elements.car, ambulance.elements.protest], 'finish');
+	Velocity([ambulance.elements.car, ambulance.elements.protest, ambulance.elements.bump], 'finish');
 
 	// open the hospital door
 	Velocity(hospital.elements.door, {
@@ -492,6 +586,8 @@ ambulance.stopFinish = function() {
 				duration: 200,
 				easing: 'ease-out-quad',
 			});
+
+			showResult();
 		}
 	});
 
