@@ -29,6 +29,7 @@ func startServer(address string) {
 
 	server.ServeFile("/velocity.min.js", "website/velocity.min.js")
 	server.ServeFile("/lodash.min.js", "website/lodash.min.js")
+	server.ServeFile("/animations.min.js", "website/animations.min.js")
 	server.ServeFile("/animations.js", "website/animations.js")
 	server.ServeFile("/application.js", "website/application.js")
 
