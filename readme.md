@@ -50,17 +50,17 @@ connected to it over ssh with a computer with Go installed (with Go Version >= 1
 > sudo apt-get install iceweasel
 
 ## INSTALL FONTS ON RASPBERRY (MAKE SURE DIRECTORY ~/.fonts EXISTS ON PI)
-> scp fonts/Open_Sans/* pi@192.168.2.22:~/.fonts
-> scp fonts/Source_Code_Pro/* pi@192.168.2.22:~/.fonts
+> scp fonts/Open_Sans/* pi@192.168.2.23:~/.fonts
+> scp fonts/Source_Code_Pro/* pi@192.168.2.23:~/.fonts
 
 ## CROSS-COMPILE GO-CODE FOR RASPBERRY PI
 > GOARM=6 GOARCH=arm GOOS=linux go build -o=pi-uninacht .
 
-## COPY TO RASPBERRY PI (GIVEN PI HAS ADDRESS of 192.168.2.22) (MAKE SURE THAT DIRECTORIES /home/pi/uninacht AND /home/pi/uninacht/website EXIST)
-> scp pi-uninacht pi@192.168.2.22:/home/pi/uninacht
-> scp config.toml pi@192.168.2.22:/home/pi/uninacht
-> scp run.sh pi@192.168.2.22:/home/pi/uninacht
-> scp ./website/* pi@192.168.2.22:/home/pi/uninacht/website
+## COPY TO RASPBERRY PI (GIVEN PI HAS ADDRESS of 192.168.2.23) (MAKE SURE THAT DIRECTORIES /home/pi/uninacht AND /home/pi/uninacht/website EXIST)
+> scp pi-uninacht pi@192.168.2.23:/home/pi/uninacht
+> scp config.toml pi@192.168.2.23:/home/pi/uninacht
+> scp run.sh pi@192.168.2.23:/home/pi/uninacht
+> scp ./website/* pi@192.168.2.23:/home/pi/uninacht/website
 
 ## CHANGE PERMISSION ON RUN SCRIPT TO MAKE IT EXECUTABLE
 > ssh pi@192.168.2.22
