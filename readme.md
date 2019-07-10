@@ -27,7 +27,7 @@ performance of the regular group.
 
 <img src="documents/buzz-wire-drawing.jpg">
 
-# ABBOUT THE BUZZ-WIRE BOX
+# ABOUT THE BUZZ-WIRE BOX
 coming soon..
 
 # ABOUT THE CODE
